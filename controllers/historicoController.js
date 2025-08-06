@@ -9,11 +9,19 @@ exports.listar = async (req, res) => {
     }
 };
 
+const { validationResult} = require('express-validator');
+
 exports.criar = async(req, res) => {
+    const erros = validationResult(req);
+    if (!erros.isEmpty()) {
+        return res.status(400).json({ erros: erros.array() });
+    }
+
     try {
+
         const novoHistorico = await Historico.create(req.body);
         res.status(201).json(novoHistorico);        
     } catch (error) {
-        res.status(404).json({ erro: error.message });
+        res.status(400).json({ erro: error.message });
     }
 };
