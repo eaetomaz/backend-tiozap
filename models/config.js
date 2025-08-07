@@ -1,6 +1,10 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
+module.exports = {
+    API_KEY: 'teste-chave-secreta'
+}
+
 const Config = sequelize.define('tconfig', {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true},
     ativar: { type: DataTypes.CHAR(1), allowNull: false },
