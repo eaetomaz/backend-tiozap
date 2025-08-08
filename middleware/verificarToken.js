@@ -1,11 +1,10 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = 'teste';
+const JWT_SECRET = '5AJZ76w4KU';
 
 const payload = {
   id: 1,
   nome: 'Guilherme'
 };
-
 
 // Geração temporária do token para auth da api
 const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
@@ -21,7 +20,7 @@ function verificarToken(req, res, next) {
 
   try {
     const payload = jwt.verify(token, JWT_SECRET);
-    req.usuario = payload; // opcional: guardar dados do usuário
+    req.usuario = payload;
     next();
   } catch (err) {
     return res.status(403).json({ erro: 'Token inválido ou expirado' });
