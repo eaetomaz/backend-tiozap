@@ -1,15 +1,3 @@
-const jwt = require('jsonwebtoken');
-const JWT_SECRET = '5AJZ76w4KU';
-
-const payload = {
-  id: 1,
-  nome: 'Guilherme'
-};
-
-// Geração temporária do token para auth da api
-const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
-console.log('Token gerado:', token);
-
 function verificarToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
