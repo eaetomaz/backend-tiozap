@@ -8,7 +8,7 @@ const payload = {
 
 exports.gerarToken = async(req, res) => {
     // Geração temporária do token para auth da api
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign(payload, JWT_SECRET);
     console.log('Token gerado:', token);
 
     return res.json({ token });
