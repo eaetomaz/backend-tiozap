@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 3001;
 const configRoutes = require('./routes/configRoutes');
 const historicoRoutes = require('./routes/historicoRoutes');
 const authRoutes = require('./routes/authRouter');
+const integrationRoutes = require('./routes/integrationRoutes');
 
 // Middlewares
 app.use(cors());
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use('/config', configRoutes);
 app.use('/historico', historicoRoutes);
 app.use('/auth', authRoutes)
+app.use('/api', integrationRoutes);
 
 sequelize.sync()
     .then(() => {
