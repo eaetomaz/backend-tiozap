@@ -24,3 +24,6 @@ build/
 
 # VSCode settings (opcional)
 .vscode/
+
+# Integration Baileys
+auth_info_baileys

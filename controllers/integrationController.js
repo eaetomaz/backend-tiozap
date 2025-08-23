@@ -13,6 +13,13 @@ async function connect(req, res) {
 async function status(req, res) {
   try {
     const status = await whatsappService.getConnectionStatus();
+    
+    if(status.status === 'connected') {
+      whatsappService.onMessage((msg) => {
+        console.log('Mensagem recebida:', msg);
+      });
+    }
+
     res.json(status);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -45,9 +52,23 @@ async function sendMedia(req, res) {
   }
 }
 
+async function listenMessage(req, res) {
+  try {
+    whatsappService.onMessage((msg) => {
+      console.log("Mensagem recebida:", msg);
+      // rever, talvez salvar no banco para o histórico futuramente
+    });
+
+    res.json({ status: 'Escutando mensagens do whatsapp...' });
+  } catch (err) {
+    res.status(500).json({ erros: err.message });
+  }
+};
+
 module.exports = {
   connect,
   status,
   sendMessage,
   sendMedia,
+  listenMessage
 };

@@ -89,9 +89,32 @@ async function sendMedia(number, filePath) {
   return { status: 'Arquivo enviado com sucesso' };
 }
 
+let listenerActive = false;
+
+function onMessage(callback) {
+  if (!sock || connectionStatus !== 'connected') 
+    throw new Error('WhatsApp não conectado');
+
+  if (!listenerActive) {
+    sock.ev.on('messages.upsert', (m) => {
+      const msg = m.messages[0];
+      if (!msg.key.fromMe && msg.message) {
+        const text =
+          msg.message.conversation ||
+          msg.message.extendedTextMessage?.text ||
+          null;
+
+        callback({ from: msg.key.remoteJid, text });
+      }
+    });
+    listenerAtivo = true;
+  }
+}
+
 module.exports = {
   connectToWhatsApp,
   getConnectionStatus,
   sendMessage,
   sendMedia,
+  onMessage
 };
