@@ -54,9 +54,8 @@ async function sendMedia(req, res) {
 
 async function listenMessage(req, res) {
   try {
-    whatsappService.onMessage((msg) => {
-      console.log("Mensagem recebida:", msg);
-      // rever, talvez salvar no banco para o histórico futuramente
+    whatsappService.onMessage(async (msg) => {      
+      console.log("Mensagem recebida:", msg);                  
     });
 
     res.json({ status: 'Escutando mensagens do whatsapp...' });

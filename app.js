@@ -3,6 +3,14 @@ const express = require('express');
 const cors = require('cors');
 const sequelize = require('./config/database');
 
+const Intencoes = require('./models/intencoes');
+const Respostas = require('./models/respostas');
+
+Intencoes.hasMany(Respostas, { as: 'respostas', foreignKey: 'id_intencao' });
+Respostas.belongsTo(Intencoes, { as: 'intencao', foreignKey: 'id_intencao' });
+
+module.exports = { Intencoes, Respostas, sequelize };
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -19,6 +27,14 @@ app.use('/config', configRoutes);
 app.use('/historico', historicoRoutes);
 app.use('/auth', authRoutes)
 app.use('/api', integrationRoutes);
+
+const whatsappService = require('./services/whatsappService');
+const { iniciarBot } = require('./services/botService');
+
+(async () => {
+  const sendMessage = await whatsappService.init();
+  iniciarBot(sendMessage);
+})();
 
 sequelize.sync()
     .then(() => {

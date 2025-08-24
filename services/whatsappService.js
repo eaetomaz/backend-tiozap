@@ -5,6 +5,11 @@ const qrcode = require('qrcode');
 const path = require('path');
 const fs = require('fs');
 const mime = require('mime-types');
+const pino = require('pino');
+
+const bot = require('../services/botService');
+
+const MensagensRecebidas = require('../models/mensagensrecebidas');
 
 let sock = null;
 let connectionStatus = 'disconnected';
@@ -19,6 +24,7 @@ async function connectToWhatsApp() {
   sock = makeWASocket({
     auth: state,
     printQRInTerminal: false,
+    logger: pino({ level: 'silent' })
   });
 
   sock.ev.on('creds.update', saveCreds);
@@ -96,22 +102,63 @@ function onMessage(callback) {
     throw new Error('WhatsApp não conectado');
 
   if (!listenerActive) {
-    sock.ev.on('messages.upsert', (m) => {
+    sock.ev.on('messages.upsert', async (m) => {
       const msg = m.messages[0];
       if (!msg.key.fromMe && msg.message) {
-        const text =
-          msg.message.conversation ||
-          msg.message.extendedTextMessage?.text ||
-          null;
 
-        callback({ from: msg.key.remoteJid, text });
+        const remoteJid = msg.key.remoteJid;
+        
+        if (remoteJid.endsWith('@s.whatsapp.net')) {
+          const text =
+            msg.message.conversation ||
+            msg.message.extendedTextMessage?.text ||
+            null;
+          
+          const record = {
+            celularremetente: remoteJid.replace('@s.whatsapp.net', '').slice(0, 20),
+            mensagem: text || '',
+            datahorarecebimento: new Date(),
+            respondida: false
+          };
+
+          try {
+            console.log('Salvando mensagem no banco de dados:', record);
+            await MensagensRecebidas.create(record);
+          } catch (err) {
+            console.error('Erro ao salvar mensagem:', err);
+          }          
+        }
       }
     });
-    listenerAtivo = true;
+    listenerActive = true;
   }
 }
 
-module.exports = {
+function waitForConnection(timeout = 20000) {
+  return new Promise((resolve, reject) => {
+    const start = Date.now();
+
+    const check = () => {
+      if (connectionStatus === 'connected') return resolve();
+      if (Date.now() - start > timeout) return reject(new Error('Timeout aguardando conexão WhatsApp'));
+      setTimeout(check, 500);
+    };
+
+    check();
+  });
+}
+
+async function init() {
+  await connectToWhatsApp();  
+  await waitForConnection();
+
+  onMessage();
+  
+  return sendMessage;
+}
+
+module.exports = {  
+  init,
   connectToWhatsApp,
   getConnectionStatus,
   sendMessage,
