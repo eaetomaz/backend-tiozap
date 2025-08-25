@@ -18,6 +18,7 @@ const configRoutes = require('./routes/configRoutes');
 const historicoRoutes = require('./routes/historicoRoutes');
 const authRoutes = require('./routes/authRouter');
 const integrationRoutes = require('./routes/integrationRoutes');
+const summaryRoutes = require('./routes/summaryRouter');
 
 // Middlewares
 app.use(cors());
@@ -27,6 +28,7 @@ app.use('/config', configRoutes);
 app.use('/historico', historicoRoutes);
 app.use('/auth', authRoutes)
 app.use('/api', integrationRoutes);
+app.use('/summary', summaryRoutes);
 
 const whatsappService = require('./services/whatsappService');
 const { iniciarBot } = require('./services/botService');
