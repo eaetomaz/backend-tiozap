@@ -140,7 +140,7 @@ function waitForConnection(timeout = 20000) {
 
     const check = () => {
       if (connectionStatus === 'connected') return resolve();
-      if (Date.now() - start > timeout) return reject(new Error('Timeout aguardando conexão WhatsApp'));
+      // if (Date.now() - start > timeout) console.log('Timeout aguardando conexão WhatsApp');
       setTimeout(check, 500);
     };
 
